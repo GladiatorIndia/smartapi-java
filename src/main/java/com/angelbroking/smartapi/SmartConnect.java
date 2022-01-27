@@ -22,23 +22,25 @@ import com.angelbroking.smartapi.models.User;
 public class SmartConnect {
 	public static SessionExpiryHook sessionExpiryHook = null;
 	public static boolean ENABLE_LOGGING = false;
-	private Proxy proxy = null;
-	private String apiKey;
-	private String accessToken;
-	private String refreshToken;
-	private Routes routes = new Routes();
-	private String userId;
-	private SmartAPIRequestHandler smartAPIRequestHandler;
+	protected Proxy proxy = null;
+	protected String apiKey;
+	protected String accessToken;
+	protected String refreshToken;
+	protected Routes routes = new Routes();
+	protected String userId;
+	protected SmartAPIRequestHandler smartAPIRequestHandler;
 
 	public SmartConnect() {
-
+		this.smartAPIRequestHandler = new SmartAPIRequestHandler(this.proxy);
 	}
 
 	public SmartConnect(String apiKey) {
+		this.smartAPIRequestHandler = new SmartAPIRequestHandler(this.proxy);
 		this.apiKey = apiKey;
 	}
 
 	public SmartConnect(String apiKey, String accessToken, String refreshToken) {
+		this.smartAPIRequestHandler = new SmartAPIRequestHandler(this.proxy);
 		this.apiKey = apiKey;
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
@@ -305,7 +307,7 @@ public class SmartConnect {
 			return order;
 		} catch (Exception | SmartAPIException e) {
 			System.out.println(e.getMessage());
-			return null;
+			throw new RuntimeException("Failed to place order. \n" + e);
 		}
 	}
 
