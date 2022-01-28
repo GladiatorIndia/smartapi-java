@@ -85,6 +85,10 @@ public class SmartConnect {
 			throw new NullPointerException();
 	}
 
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+
 	/**
 	 * Returns userId.
 	 * 
@@ -198,29 +202,30 @@ public class SmartConnect {
 	 * @return TokenSet contains user id, refresh token, api secret.
 	 * 
 	 */
-	public TokenSet renewAccessToken(String accessToken, String refreshToken) {
+	public SmartConnect renewAccessToken() {
 		try {
-			String hashableText = this.apiKey + refreshToken + accessToken;
-			String sha256hex = sha256Hex(hashableText);
 
-			JSONObject params = new JSONObject();
-			params.put("refreshToken", refreshToken);
-			params.put("checksum", sha256hex);
-			String url = routes.get("api.refresh");
-			JSONObject response = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
+			JSONObject jsonObject = getProfileJson();
+			if (jsonObject.getString("errorcode").equals("AB1010")) {
+				String hashableText = this.apiKey + refreshToken + accessToken;
+				String sha256hex = sha256Hex(hashableText);
 
-			accessToken = response.getJSONObject("data").getString("jwtToken");
-			refreshToken = response.getJSONObject("data").getString("refreshToken");
+				JSONObject params = new JSONObject();
+				params.put("refreshToken", refreshToken);
+				params.put("checksum", sha256hex);
+				String url = routes.get("api.refresh");
+				JSONObject response = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
 
-			TokenSet tokenSet = new TokenSet();
-			tokenSet.setUserId(userId);
-			tokenSet.setAccessToken(accessToken);
-			tokenSet.setRefreshToken(refreshToken);
+				accessToken = response.getJSONObject("data").getString("jwtToken");
+				refreshToken = response.getJSONObject("data").getString("refreshToken");
 
-			return tokenSet;
+				return this;
+			} else {
+				return this;
+			}
 		} catch (Exception | SmartAPIException e) {
 			System.out.println(e.getMessage());
-			return null;
+			throw new RuntimeException("Failed to renew token"+e);
 		}
 	}
 
@@ -252,6 +257,16 @@ public class SmartConnect {
 		} catch (Exception | SmartAPIException e) {
 			System.out.println(e.getMessage());
 			return null;
+		}
+	}
+
+	public JSONObject getProfileJson() {
+		try {
+			String url = routes.get("api.user.profile");
+			return  smartAPIRequestHandler.getRequest(this.apiKey, url, accessToken);
+		} catch (Exception | SmartAPIException e) {
+			System.out.println(e.getMessage());
+			throw new RuntimeException("Failed to get profile. \n"+ e);
 		}
 	}
 
