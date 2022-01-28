@@ -264,7 +264,7 @@ public class SmartConnect {
 	 * @return Order contains only orderId.
 	 * 
 	 */
-	public Order placeOrder(OrderParams orderParams, String variety) {
+	public JSONObject placeOrder(OrderParams orderParams, String variety) {
 
 		try {
 			String url = routes.get("api.order.place");
@@ -301,15 +301,21 @@ public class SmartConnect {
 			params.put("variety", variety);
 
 			JSONObject jsonObject = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
-			Order order = new Order();
+			return jsonObject;
+			/*Order order = new Order();
+			if (jsonObject.getBoolean("status") == false && jsonObject.getString("errorcode").equals("AB1010")) {
+
+			}
 			order.orderId = jsonObject.getJSONObject("data").getString("orderid");
 			System.out.println(order);
-			return order;
+			return order;*/
 		} catch (Exception | SmartAPIException e) {
 			System.out.println(e.getMessage());
 			throw new RuntimeException("Failed to place order. \n" + e);
 		}
 	}
+
+
 
 	/**
 	 * Modifies an open order.

@@ -96,8 +96,8 @@ public class Examples {
 		orderParams.price = 122.2;
 		orderParams.triggerprice = "209";
 
-		Order order = smartConnect.placeOrder(orderParams, "STOPLOSS");
-		System.out.print(order);
+//		Order order = smartConnect.placeOrder(orderParams, "STOPLOSS");
+//		System.out.print(order);
 	}
 
 	/** Modify order. */
