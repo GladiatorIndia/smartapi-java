@@ -260,13 +260,12 @@ public class SmartConnect {
 		}
 	}
 
-	public JSONObject getProfileJson() {
+	public JSONObject getProfileJson() throws SmartAPIException {
+		String url = routes.get("api.user.profile");
 		try {
-			String url = routes.get("api.user.profile");
 			return  smartAPIRequestHandler.getRequest(this.apiKey, url, accessToken);
-		} catch (Exception | SmartAPIException e) {
-			System.out.println(e.getMessage());
-			throw new RuntimeException("Failed to get profile. \n"+ e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
